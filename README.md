@@ -21,4 +21,7 @@ This Project consist of:
  - Pin Generat
      => Shared Preference: if logged in then we generate the pin and if already pin is set up we can just enter the app by entering the earlier saved pin.
  - Product 
-     =>
+     => Products can be add and the details will be stored in firebase Firestore
+     => qr code is generated while viewing the details of the product
+     => listing of the products is done in main screen
+this project is done in clean architecture using bloc state management
