@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "722222950412",
+    "project_id": "machinetesttechware",
+    "storage_bucket": "machinetesttechware.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:722222950412:android:7b5d2b917eeac072d1e629",
+        "android_client_info": {
+          "package_name": "com.example.machine_test_techware"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaKjBhj54H8WMGpTB7bHgHGzv4nRzCGuI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
