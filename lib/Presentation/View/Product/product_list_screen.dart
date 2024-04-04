@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:machine_test_techware/Data/Model/product_model.dart';
+import 'package:machine_test_techware/Presentation/Utils/components.dart';
 import 'package:machine_test_techware/Presentation/Utils/constants.dart';
 import 'package:machine_test_techware/Presentation/Utils/route_manager.dart';
 import 'package:machine_test_techware/Presentation/Utils/shared_preferences.dart';
+import 'package:machine_test_techware/Presentation/View/Product/add_product_screen.dart';
 import 'package:machine_test_techware/Presentation/View/Product/product_view_screen.dart';
 import 'package:machine_test_techware/bloc/product_bloc.dart';
 import 'package:machine_test_techware/bloc/product_event.dart';
@@ -130,6 +132,24 @@ class _ProductListScreenState extends State<ProductListScreen> {
               ),
             ),
           ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        shape: CircleBorder(),
+        onPressed: () {
+          Components.commonDialog(
+            context,
+            "Add Products",
+            SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: AddProductScreen()),
+          );
+        },
+        elevation: 0,
+        backgroundColor: AppColors.primary,
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
         ),
       ),
     );
