@@ -2,10 +2,14 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:machine_test_techware/Data/Model/product_model.dart';
 import 'package:machine_test_techware/Data/Repositories/product_repository.dart';
 import 'package:machine_test_techware/Presentation/Utils/components.dart';
 import 'package:machine_test_techware/Presentation/Utils/constants.dart';
+import 'package:machine_test_techware/Presentation/Utils/route_manager.dart';
+import 'package:machine_test_techware/Presentation/Utils/shared_preferences.dart';
+import 'package:machine_test_techware/Presentation/Utils/snackbar_services.dart';
 import 'package:machine_test_techware/Presentation/View/Product/add_product_screen.dart';
 import 'package:machine_test_techware/Presentation/View/Product/product_view_screen.dart';
 import 'package:machine_test_techware/Presentation/View/Product/qr_scanner.dart';
@@ -33,6 +37,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Product List'),
+        actions: [
+          IconButton(
+              onPressed: () {
+                UserPreferences.setIsLoggedIn(false);
+                UserPreferences.setPin(0);
+                Navigator.pushReplacementNamed(
+                    context, RouteManager.signInScreen);
+              },
+              icon: Icon(Icons.logout))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -77,35 +91,71 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       itemCount: state.products.length,
                       itemBuilder: (context, index) {
                         Map<String, dynamic> product = state.products[index];
-                        return InkWell(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProductViewScreen(
-                                    product: ProductModel(
-                                        product['name'],
-                                        product['measurement'],
-                                        "${product['price']}")),
-                              )),
-                          child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              shadowColor: Colors.black,
-                              elevation: 10,
-                              child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    color: Colors.white,
+                        return Slidable(
+                            startActionPane: ActionPane(
+                                motion: const DrawerMotion(),
+                                children: [
+                                  SlidableAction(
+                                      backgroundColor: Colors.green[100]!,
+                                      foregroundColor: Colors.green,
+                                      icon: Icons.edit,
+                                      onPressed: (val) {})
+                                ]),
+                            endActionPane: ActionPane(
+                              motion: const DrawerMotion(),
+                              children: [
+                                BlocListener<QRGeneratorBloc,
+                                        QRGeneratorMainState>(
+                                    listener: (contexts, state) {
+                                      if (state is ProductDelete) {
+                                        SnackBarServices.errorSnackbar(
+                                            "Deleted product Successfully");
+                                        contexts
+                                            .read<QRGeneratorBloc>()
+                                            .add(FetchData());
+                                      }
+                                    },
+                                    child: SlidableAction(
+                                      backgroundColor: Colors.red[100]!,
+                                      foregroundColor: Colors.red,
+                                      icon: Icons.delete,
+                                      onPressed: (val) {
+                                        context.read<QRGeneratorBloc>().add(
+                                            DeleteProduct(product['name']));
+                                      },
+                                    ))
+                              ],
+                            ),
+                            child: InkWell(
+                              onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProductViewScreen(
+                                        product: ProductModel(
+                                            product['name'],
+                                            product['measurement'],
+                                            "${product['price']}")),
+                                  )),
+                              child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: ListTile(
-                                        title: Text(product['name'] ?? ''),
-                                        subtitle: Text(
-                                            'Measurement: ${product['measurement'] ?? ''}, Price: ${product['price'] ?? ''}'),
-                                      )))),
-                        );
+                                  shadowColor: Colors.black,
+                                  elevation: 10,
+                                  child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        color: Colors.white,
+                                      ),
+                                      child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: ListTile(
+                                            title: Text(product['name'] ?? ''),
+                                            subtitle: Text(
+                                                'Measurement: ${product['measurement'] ?? ''}, Price: ${product['price'] ?? ''}'),
+                                          )))),
+                            ));
                       },
                     );
                   } else {
@@ -172,6 +222,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
             },
           );
         },
+        elevation: 0,
         backgroundColor: AppColors.primary,
         child: Icon(
           Icons.add,

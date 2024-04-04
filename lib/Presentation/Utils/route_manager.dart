@@ -1,6 +1,4 @@
 import 'package:machine_test_techware/Presentation/View/Product/product_list_screen.dart';
-import 'package:machine_test_techware/Presentation/View/Product/product_view_screen.dart';
-import 'package:machine_test_techware/Presentation/View/home_screen.dart';
 import 'package:machine_test_techware/Presentation/View/pin_login_screen.dart';
 import 'package:machine_test_techware/Presentation/View/registeration_screen.dart';
 import 'package:machine_test_techware/Presentation/View/sign_in_screen.dart';

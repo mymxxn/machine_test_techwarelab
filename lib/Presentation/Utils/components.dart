@@ -5,7 +5,8 @@ class Components {
           {required String txt,
           required TextEditingController controller,
           required TextInputType inputtype,
-          Function(dynamic)? onChanged}) =>
+          Function(dynamic)? onChanged,
+          bool obscureText = false}) =>
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -17,9 +18,11 @@ class Components {
             height: 4,
           ),
           TextField(
+            obscureText: obscureText,
             controller: controller,
             keyboardType: inputtype,
             onChanged: onChanged,
+            textInputAction: TextInputAction.none,
             decoration: InputDecoration(
                 contentPadding:
                     const EdgeInsets.symmetric(vertical: 8, horizontal: 10),

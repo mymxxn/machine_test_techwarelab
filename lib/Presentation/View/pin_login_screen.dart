@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:machine_test_techware/Presentation/Utils/shared_preferences.dart';
+import 'package:machine_test_techware/Presentation/Utils/snackbar_services.dart';
 
 class PinLogin extends StatefulWidget {
   @override
@@ -34,6 +35,8 @@ class _PinLoginState extends State<PinLogin> {
                 onSubmit: (String verificationCode) {
                   if (int.parse(verificationCode) == UserPreferences.getPin()) {
                     Navigator.pushReplacementNamed(context, '/home');
+                  } else {
+                    SnackBarServices.errorSnackbar("Wrong Pin");
                   }
                 }, // end onSubmit
               ),

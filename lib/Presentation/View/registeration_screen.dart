@@ -78,6 +78,7 @@ class RegisterationScreen extends StatelessWidget {
             Components.commonTextfield(
               txt: "Password",
               controller: passwordController,
+              obscureText: true,
               inputtype: TextInputType.visiblePassword,
             ),
             const SizedBox(

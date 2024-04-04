@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:machine_test_techware/Presentation/Utils/components.dart';
+import 'package:machine_test_techware/Presentation/Utils/constants.dart';
 import 'package:machine_test_techware/Presentation/Utils/route_manager.dart';
 import 'package:machine_test_techware/Presentation/Utils/shared_preferences.dart';
 import 'package:machine_test_techware/Presentation/View/pin_login_screen.dart';
@@ -18,10 +19,10 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
-  void initState() {  
+  void initState() {
     super.initState();
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      _checkLoggedIn();
+      Future.delayed(Duration(seconds: 1)).then((value) => _checkLoggedIn());
     });
   }
 
@@ -29,7 +30,7 @@ class _SplashScreenState extends State<SplashScreen> {
     bool isLoggedIn = UserPreferences.getIsLoggedIn() ?? false;
 
     if (isLoggedIn) {
-      if (UserPreferences.getPin() == null) {
+      if (UserPreferences.getPin() == null || UserPreferences.getPin() == 0) {
         Navigator.pushReplacementNamed(context, RouteManager.pinLoginScreen);
         Components.commonDialog(
           context,
@@ -57,6 +58,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(child: Text("Welcome"));
+    return Scaffold(
+      body: Container(color: AppColors.primary,
+          child: Center(
+              child: Text(
+        "Welcome",
+        style: TextStyle(fontSize: 25, color: Colors.white),
+      ))),
+    );
   }
 }

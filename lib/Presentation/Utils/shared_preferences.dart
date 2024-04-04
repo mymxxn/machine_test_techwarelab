@@ -9,6 +9,6 @@ class UserPreferences {
   static Future setIsLoggedIn(bool IsLoggedIn) async =>
       preferences!.setBool(_keyIsLoggedIn, IsLoggedIn);
   static bool? getIsLoggedIn() => preferences!.getBool(_keyIsLoggedIn);
-  static Future setPin(int pin) async => preferences!.setInt(_keyPin, pin);
+  static setPin(int pin) async => preferences!.setInt(_keyPin, pin);
   static int? getPin() => preferences!.getInt(_keyPin);
 }

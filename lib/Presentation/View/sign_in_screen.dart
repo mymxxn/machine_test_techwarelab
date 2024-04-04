@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
+import 'package:get/get.dart';
 import 'package:machine_test_techware/Presentation/Utils/components.dart';
 import 'package:machine_test_techware/Presentation/Utils/constants.dart';
 import 'package:machine_test_techware/Presentation/Utils/route_manager.dart';
@@ -56,10 +57,10 @@ class SignInScreen extends StatelessWidget {
                 height: 15,
               ),
               Components.commonTextfield(
-                txt: "Password",
-                controller: passwordController,
-                inputtype: TextInputType.visiblePassword,
-              ),
+                  txt: "Password",
+                  controller: passwordController,
+                  inputtype: TextInputType.visiblePassword,
+                  obscureText: true),
               const SizedBox(
                 height: 15,
               ),
@@ -74,7 +75,8 @@ class SignInScreen extends StatelessWidget {
                     log("${UserPreferences.getIsLoggedIn()} logged in");
                     log("${UserPreferences.getPin()} pin");
 
-                    if (UserPreferences.getPin() == null) {
+                    if (UserPreferences.getPin() == 0 ||
+                        UserPreferences.getPin() == null) {
                       Navigator.pushReplacementNamed(
                           context, RouteManager.pinLoginScreen);
                       Components.commonDialog(
@@ -89,7 +91,7 @@ class SignInScreen extends StatelessWidget {
                           },
                           onSubmit: (String verificationCode) {
                             UserPreferences.setPin(int.parse(verificationCode));
-                            Navigator.pop(context);
+                            Get.back();
                           },
                         ),
                       );
