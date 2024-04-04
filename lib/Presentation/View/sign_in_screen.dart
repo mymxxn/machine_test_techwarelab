@@ -135,7 +135,7 @@ class SignInScreen extends StatelessWidget {
                   const Text("Don't have an account?"),
                   TextButton(
                       onPressed: () {
-                        Navigator.pushNamed(
+                        Navigator.pushReplacementNamed(
                             context, RouteManager.registerationScreen);
                       },
                       child: const Text(
