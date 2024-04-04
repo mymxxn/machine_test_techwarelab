@@ -1,18 +1,10 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:machine_test_techware/Data/Model/product_model.dart';
-import 'package:machine_test_techware/Data/Repositories/product_repository.dart';
-import 'package:machine_test_techware/Presentation/Utils/components.dart';
 import 'package:machine_test_techware/Presentation/Utils/constants.dart';
 import 'package:machine_test_techware/Presentation/Utils/route_manager.dart';
 import 'package:machine_test_techware/Presentation/Utils/shared_preferences.dart';
-import 'package:machine_test_techware/Presentation/Utils/snackbar_services.dart';
-import 'package:machine_test_techware/Presentation/View/Product/add_product_screen.dart';
 import 'package:machine_test_techware/Presentation/View/Product/product_view_screen.dart';
-import 'package:machine_test_techware/Presentation/View/Product/qr_scanner.dart';
 import 'package:machine_test_techware/bloc/product_bloc.dart';
 import 'package:machine_test_techware/bloc/product_event.dart';
 import 'package:machine_test_techware/bloc/product_state.dart';
@@ -24,11 +16,10 @@ class ProductListScreen extends StatefulWidget {
 
 class _ProductListScreenState extends State<ProductListScreen> {
   TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
     context.read<QRGeneratorBloc>().add(FetchData());
   }
 
@@ -39,13 +30,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
         title: Text('Product List'),
         actions: [
           IconButton(
-              onPressed: () {
-                UserPreferences.setIsLoggedIn(false);
-                UserPreferences.setPin(0);
-                Navigator.pushReplacementNamed(
-                    context, RouteManager.signInScreen);
-              },
-              icon: Icon(Icons.logout))
+            onPressed: () {
+              UserPreferences.setIsLoggedIn(false);
+              UserPreferences.setPin(0);
+              Navigator.pushReplacementNamed(
+                context,
+                RouteManager.signInScreen,
+              );
+            },
+            icon: Icon(Icons.logout),
+          )
         ],
       ),
       body: Padding(
@@ -53,35 +47,31 @@ class _ProductListScreenState extends State<ProductListScreen> {
         child: Column(
           children: [
             TextField(
-                controller: _searchController,
-                onChanged: (value) {
-                  if (_searchController.text.isNotEmpty) {
-                    context
-                        .read<QRGeneratorBloc>()
-                        .add(SearchProduct(_searchController.text.trim()));
-                  } else {
-                    context.read<QRGeneratorBloc>().add(FetchData());
-                  }
-                },
-                decoration: InputDecoration(
-                    hintText: "Search",
-                    hintStyle: TextStyle(color: Colors.grey),
-                    suffixIcon: IconButton(
-                        onPressed: () {
-                          Components.commonDialog(
-                              context, "Scan Product", QrScanner());
-                        },
-                        icon: Icon(Icons.qr_code)),
-                    isCollapsed: true,
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(),
-                        borderRadius: BorderRadius.circular(10)))),
+              controller: _searchController,
+              onChanged: (value) {
+                if (_searchController.text.isNotEmpty) {
+                  context
+                      .read<QRGeneratorBloc>()
+                      .add(SearchProduct(value.trim()));
+                } else {
+                  context.read<QRGeneratorBloc>().add(FetchData());
+                }
+              },
+              decoration: InputDecoration(
+                hintText: "Search",
+                hintStyle: TextStyle(color: Colors.grey),
+                isCollapsed: true,
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
             Expanded(
               child: BlocBuilder<QRGeneratorBloc, QRGeneratorMainState>(
                 builder: (context, state) {
-                  log(state.toString());
                   if (state is DataLoading) {
                     return Center(child: CircularProgressIndicator());
                   } else if (state is DataFetchFail) {
@@ -91,71 +81,46 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       itemCount: state.products.length,
                       itemBuilder: (context, index) {
                         Map<String, dynamic> product = state.products[index];
-                        return Slidable(
-                            startActionPane: ActionPane(
-                                motion: const DrawerMotion(),
-                                children: [
-                                  SlidableAction(
-                                      backgroundColor: Colors.green[100]!,
-                                      foregroundColor: Colors.green,
-                                      icon: Icons.edit,
-                                      onPressed: (val) {})
-                                ]),
-                            endActionPane: ActionPane(
-                              motion: const DrawerMotion(),
-                              children: [
-                                BlocListener<QRGeneratorBloc,
-                                        QRGeneratorMainState>(
-                                    listener: (contexts, state) {
-                                      if (state is ProductDelete) {
-                                        SnackBarServices.errorSnackbar(
-                                            "Deleted product Successfully");
-                                        contexts
-                                            .read<QRGeneratorBloc>()
-                                            .add(FetchData());
-                                      }
-                                    },
-                                    child: SlidableAction(
-                                      backgroundColor: Colors.red[100]!,
-                                      foregroundColor: Colors.red,
-                                      icon: Icons.delete,
-                                      onPressed: (val) {
-                                        context.read<QRGeneratorBloc>().add(
-                                            DeleteProduct(product['name']));
-                                      },
-                                    ))
-                              ],
-                            ),
-                            child: InkWell(
-                              onTap: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProductViewScreen(
-                                        product: ProductModel(
-                                            product['name'],
-                                            product['measurement'],
-                                            "${product['price']}")),
-                                  )),
-                              child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
+                        return InkWell(
+                          onTap: () {
+                            _searchController.clear();
+                            context.read<QRGeneratorBloc>().add(FetchData());
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProductViewScreen(
+                                  product: ProductModel(
+                                    product['name'],
+                                    product['measurement'],
+                                    "${product['price']}",
                                   ),
-                                  shadowColor: Colors.black,
-                                  elevation: 10,
-                                  child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        color: Colors.white,
-                                      ),
-                                      child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: ListTile(
-                                            title: Text(product['name'] ?? ''),
-                                            subtitle: Text(
-                                                'Measurement: ${product['measurement'] ?? ''}, Price: ${product['price'] ?? ''}'),
-                                          )))),
-                            ));
+                                ),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            shadowColor: Colors.black,
+                            elevation: 10,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12.0),
+                                color: Colors.white,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ListTile(
+                                  title: Text(product['name'] ?? ''),
+                                  subtitle: Text(
+                                    'Measurement: ${product['measurement'] ?? ''}, Price: ${product['price'] ?? ''}',
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
                       },
                     );
                   } else {
@@ -165,68 +130,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
               ),
             ),
           ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        shape: CircleBorder(),
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                backgroundColor: Colors.white,
-                insetPadding: EdgeInsets.all(10),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12))),
-                title: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            "Add Product",
-                            style: TextStyle(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15),
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: CircleAvatar(
-                            radius: 12,
-                            backgroundColor: Colors.black87,
-                            child: Icon(
-                              Icons.close,
-                              color: Colors.white,
-                              size: 15,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    Divider(
-                      color: Colors.grey,
-                    ),
-                  ],
-                ),
-                content: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: AddProductScreen()),
-              );
-            },
-          );
-        },
-        elevation: 0,
-        backgroundColor: AppColors.primary,
-        child: Icon(
-          Icons.add,
-          color: Colors.white,
         ),
       ),
     );

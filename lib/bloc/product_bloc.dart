@@ -8,6 +8,7 @@ import 'package:machine_test_techware/bloc/product_state.dart';
 import 'package:bloc/bloc.dart';
 
 class QRGeneratorBloc extends Bloc<QRGeneratorEvent, QRGeneratorMainState> {
+  List<Map<String, dynamic>> _localProducts = [];
   final ProductRepository _repository;
 
   QRGeneratorBloc(this._repository) : super(QRGeneratorInitial()) {
@@ -30,18 +31,13 @@ class QRGeneratorBloc extends Bloc<QRGeneratorEvent, QRGeneratorMainState> {
     );
     on<FetchData>(
       (event, emit) async {
-        log("message");
-        // emit(DataLoading());
         try {
-          log("message1");
           QuerySnapshot querySnapshot =
               await FirebaseFirestore.instance.collection('products').get();
-          log("message2");
-          List<Map<String, dynamic>> products = querySnapshot.docs
+          _localProducts = querySnapshot.docs
               .map((doc) => doc.data() as Map<String, dynamic>)
               .toList();
-          log("message3");
-          emit(DataLoaded(products));
+          emit(DataLoaded(_localProducts));
         } catch (error) {
           emit(DataFetchFail(error.toString()));
         }
@@ -60,14 +56,16 @@ class QRGeneratorBloc extends Bloc<QRGeneratorEvent, QRGeneratorMainState> {
     on<SearchProduct>(
       (event, emit) async {
         try {
-          QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-              .collection('products')
-              .where('name', arrayContains: event.query)
-              .get();
-          List<Map<String, dynamic>> products = querySnapshot.docs
-              .map((doc) => doc.data() as Map<String, dynamic>)
+          log("${_localProducts}");
+          // Filter the local products list based on the search query
+          List<Map<String, dynamic>> filteredProducts = _localProducts
+              .where((product) => product['name']
+                  .toLowerCase()
+                  .contains(event.query.toLowerCase()))
               .toList();
-          emit(DataLoaded(products));
+
+          // Emit the filtered list as DataLoaded state
+          emit(DataLoaded(filteredProducts));
         } catch (error) {
           emit(QRGeneratorFailure(error.toString()));
         }
